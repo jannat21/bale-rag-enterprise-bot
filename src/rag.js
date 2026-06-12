@@ -185,7 +185,10 @@ async function buildContext(question, embedder, keywordDocs, topK = 3) {
 /**
  * ساخت prompt نهایی
  */
-function buildPrompt(question, context) {
+
+
+
+function buildPrompt_OLD(question, context) {
     return `
 شما یک دستیار فارسی دقیق برای پاسخ‌گویی بر اساس اسناد داخلی هستید.
 فقط بر اساس متن زمینه پاسخ بده و هیچ اطلاعاتی از خودت اضافه نکن.
@@ -211,7 +214,7 @@ async function askModel(prompt) {
     const response = await axios.post(
         `${process.env.GAPGPT_BASE_URL}/chat/completions`,
         {
-            model: "gpt-4o",
+            model: "gpt-5-nano",
             messages: [
                 {
                     role: "system",
@@ -239,27 +242,27 @@ async function askModel(prompt) {
 /**
  * تابع اصلی
  */
-async function askGapGPT(question, embedder, keywordDocs) {
+async function askGapGPT_OLD(question, embedder, keywordDocs) {
     try {
         const { context, docs } = await buildContext(question, embedder, keywordDocs, 3);
 
-        console.log("========== QUESTION ==========");
-        console.log(question);
+        // console.log("========== QUESTION ==========");
+        // console.log(question);
 
-        console.log("========== RETRIEVED DOCS ==========");
-        console.log(
-            docs.map((d, i) => ({
-                rank: i + 1,
-                source: d.metadata.source || d.metadata.file || d.metadata.filename || "unknown-source",
-                page: d.metadata.page || d.metadata.pageNumber || d.metadata.page_number || "",
-                keywordScore: d.keywordScore,
-                vectorScore: d.vectorScore,
-                finalScore: d.finalScore
-            }))
-        );
+        // console.log("========== RETRIEVED DOCS ==========");
+        // console.log(
+        //     docs.map((d, i) => ({
+        //         rank: i + 1,
+        //         source: d.metadata.source || d.metadata.file || d.metadata.filename || "unknown-source",
+        //         page: d.metadata.page || d.metadata.pageNumber || d.metadata.page_number || "",
+        //         keywordScore: d.keywordScore,
+        //         vectorScore: d.vectorScore,
+        //         finalScore: d.finalScore
+        //     }))
+        // );
 
-        console.log("========== CONTEXT ==========");
-        console.log(context || "[EMPTY CONTEXT]");
+        // console.log("========== CONTEXT ==========");
+        // console.log(context || "[EMPTY CONTEXT]");
 
         if (!context || !context.trim()) {
             return "اطلاعات کافی در اسناد پیدا نشد.";
@@ -267,17 +270,77 @@ async function askGapGPT(question, embedder, keywordDocs) {
 
         const prompt = buildPrompt(question, context);
 
-        console.log("========== FINAL PROMPT ==========");
-        console.log(prompt);
+        // console.log("========== FINAL PROMPT ==========");
+        // console.log(prompt);
 
         const answer = await askModel(prompt);
 
-        console.log("========== MODEL ANSWER ==========");
-        console.log(answer);
+        // console.log("========== MODEL ANSWER ==========");
+        // console.log(answer);
 
         return answer;
     } catch (error) {
         console.error("RAG ERROR:", error?.response?.data || error.message || error);
+        return "در پردازش سؤال خطایی رخ داد.";
+    }
+}
+
+function buildPrompt(question, context, history = []) {
+    let historyText = "";
+    if (history.length > 0) {
+        historyText = "برای درک ارجاعات (مانند 'آن'، 'این پروژه')، تاریخچه گفتگو را بخوان:\n" +
+            history.map(msg => `${msg.role === "user" ? "کاربر" : "دستیار"}: ${msg.content}`).join("\n") + "\n\n";
+    }
+    return `
+شما یک دستیار فارسی هستید که بر اساس اسناد داخلی پاسخ می‌دهد.
+
+⚠️ قوانین بسیار مهم:
+1. هر سوال را کاملاً مستقل از پاسخ‌های قبلی ارزیابی کن.
+2. پاسخ قبلی که "اطلاعات کافی نیست" بوده، به این معنا نیست که سوال بعدی هم بی‌پاسخ است.
+3. فقط و فقط به "متن زمینه" (اسناد) نگاه کن. اگر در متن زمینه پاسخ وجود دارد، حتماً بده.
+4. اگر پاسخ در متن زمینه وجود نداشت، فقط بنویس: «اطلاعات کافی در اسناد پیدا نشد.»
+5. از تاریخچه فقط برای فهمیدن ضمایر و ارجاعات استفاده کن، نه برای قضاوت درباره وجود پاسخ.
+
+${historyText}
+متن زمینه (اسناد):
+${context || "متنی یافت نشد"}
+
+سؤال فعلی:
+${question}
+
+پاسخ (بر اساس متن زمینه و بدون توجه به پاسخ‌های قبلی):
+`.trim();
+}
+
+// تغییر تابع askGapGPT برای دریافت history
+async function askGapGPT(question, embedder, keywordDocs, chatId = null) {
+    try {
+        // اگر chatId داده شده، تاریخچه را دریافت کن
+        let history = [];
+        if (chatId) {
+            const { getRelevantHistory } = require("./chatHistory");
+            history = await getRelevantHistory(chatId, 4); // آخرین ۴ پیام (۲ دور گفتگو)
+            //const { getRecentHistory } = require("./chatHistory");
+            //history = await getRecentHistory(chatId, 4); // آخرین ۴ پیام (۲ دور گفتگو)
+        }
+
+        const { context, docs } = await buildContext(question, embedder, keywordDocs, 3);
+
+        if (!context || !context.trim()) {
+            return "اطلاعات کافی در اسناد پیدا نشد.";
+        }
+
+        const prompt = buildPrompt(question, context, history);
+
+        // console.log("__________________________________");
+        // console.log("PROMPT: ", prompt);
+        // console.log("END OF PROMPT.");
+        // console.log("__________________________________");
+
+        const answer = await askModel(prompt);
+        return answer;
+    } catch (error) {
+        console.error("RAG ERROR:", error?.response?.data || error.message);
         return "در پردازش سؤال خطایی رخ داد.";
     }
 }

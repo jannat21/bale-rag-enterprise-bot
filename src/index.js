@@ -38,9 +38,9 @@ function initKeywordIndex() {
 
     keywordDocs = buildKeywordIndex(store);
 
-    console.log("========== INDEX LOADED ==========");
-    console.log(`STORE_PATH: ${STORE_PATH}`);
-    console.log(`keywordDocs count: ${keywordDocs.length}`);
+    // console.log("========== INDEX LOADED ==========");
+    // console.log(`STORE_PATH: ${STORE_PATH}`);
+    // console.log(`keywordDocs count: ${keywordDocs.length}`);
 }
 
 async function sendMessage(chatId, text) {
@@ -79,11 +79,11 @@ async function pollUpdates(embedder) {
                 const chatId = msg.chat.id;
                 const question = msg.text.trim();
 
-                console.log("\n========================================");
-                console.log("NEW MESSAGE FROM BALE");
-                console.log("chatId:", chatId);
-                console.log("question:", question);
-                console.log("========================================\n");
+                // console.log("\n========================================");
+                // console.log("NEW MESSAGE FROM BALE");
+                // console.log("chatId:", chatId);
+                // console.log("question:", question);
+                // console.log("========================================\n");
 
                 let answer = "در پردازش سؤال خطایی رخ داد.";
 
@@ -113,10 +113,10 @@ async function main() {
     try {
         validateEnv();
 
-        console.log("========== BOT STARTING ==========");
-        console.log("BALE_TOKEN loaded:", !!BALE_TOKEN);
-        console.log("GAPGPT_BASE_URL:", process.env.GAPGPT_BASE_URL);
-        console.log("==================================");
+        // console.log("========== BOT STARTING ==========");
+        // console.log("BALE_TOKEN loaded:", !!BALE_TOKEN);
+        // console.log("GAPGPT_BASE_URL:", process.env.GAPGPT_BASE_URL);
+        // console.log("==================================");
 
         initKeywordIndex();
 
