@@ -2,7 +2,7 @@ const axios = require("axios");
 
 const TOKEN = process.env.BALE_TOKEN;
 const BASE =
-`https://tapi.bale.ai/bot${TOKEN}`;
+  `https://tapi.bale.ai/bot${TOKEN}`;
 
 async function getUpdates(offset) {
   const res = await axios.post(
@@ -26,7 +26,17 @@ async function sendMessage(chatId, text) {
   );
 }
 
+// تابع جدید برای ارسال عکس
+async function sendPhoto(chatId, photoUrl, caption = "") {
+  await axios.post(`${BASE}/sendPhoto`, {
+    chat_id: chatId,
+    photo: photoUrl,      // می‌تواند URL یا file_id باشد
+    caption: caption
+  });
+}
+
 module.exports = {
   getUpdates,
-  sendMessage
+  sendMessage,
+  sendPhoto
 };
