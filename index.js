@@ -95,8 +95,10 @@ async function main() {
 
         // --- دستورات اسلش ---
         if (text === "/start") {
-          await sendMessage(chatId, "به ربات خوش آمدید! سوال خود را بپرسید.");
+          const welcomeText = "به ربات خوش آمدید!\n\nمن می‌توانم به سوالات شما بر اساس اسناد شرکت پاسخ دهم. سوال خود را بپرسید.";
+          //await sendMessage(chatId, "به ربات خوش آمدید! سوال خود را بپرسید.");
           await sendPhoto(chatId, "https://uploadkon.ir/uploads/a0a513_26welcome.jpg", "ربات هوشمند");
+          await sendMessage(chatId, welcomeText, getMainReplyMenu());
           continue;
         }
 
