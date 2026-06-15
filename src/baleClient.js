@@ -31,4 +31,14 @@ async function answerCallbackQuery(callbackQueryId, text = null) {
   await axios.post(`${BASE}/answerCallbackQuery`, payload);
 }
 
-module.exports = { getUpdates, sendMessage, sendPhoto, answerCallbackQuery };
+async function editMessageText(chatId, messageId, text, replyMarkup = null) {
+  const payload = {
+    chat_id: chatId,
+    message_id: messageId,
+    text: text
+  };
+  if (replyMarkup) payload.reply_markup = replyMarkup;
+  await axios.post(`${BASE}/editMessageText`, payload);
+}
+
+module.exports = { getUpdates, sendMessage, sendPhoto, answerCallbackQuery, editMessageText };

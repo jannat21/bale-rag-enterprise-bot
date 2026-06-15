@@ -9,8 +9,16 @@ const { loadStore } = require("./src/vectorStore");
 const { askGapGPT } = require("./src/rag");
 const { createEmbedder } = require("./src/localEmbeddings");
 const { initDatabase, saveMessage } = require("./src/chatHistory");
-const { sendMessage, sendPhoto, answerCallbackQuery } = require("./src/baleClient");
-const { getMainReplyMenu, getMainInlineMenu } = require("./src/menuHelper");
+const { sendMessage, sendPhoto, answerCallbackQuery, editMessageText } = require("./src/baleClient");
+const {
+  getMainReplyMenu,
+  getMainInlineMenu,
+  getFaqQuestionsMenu,
+  getBackToFaqMenuButton,
+  getHelpText,
+  getHelpMenu,
+  getContactMenu
+} = require("./src/menuHelper");
 
 const BALE_TOKEN = process.env.BALE_TOKEN;
 const STORE_PATH = path.join(__dirname, "data/vectorStore.json");
@@ -70,22 +78,79 @@ async function main() {
         if (update.callback_query) {
           const query = update.callback_query;
           const chatId = query.message.chat.id.toString();
+          const messageId = query.message.message_id;
           const data = query.data;
 
-          // اعلام دریافت به سرور بله (برای رفع چرخیدن دکمه)
           await answerCallbackQuery(query.id);
 
-          if (data === 'menu_courses') {
-            await sendMessage(chatId, "دوره‌های موجود:\n• برنامه‌نویسی پایتون\n• طراحی سایت با React\n• هوش مصنوعی");
-          } else if (data === 'menu_faq') {
-            await sendMessage(chatId, "سوالات رایج:\n۱. هزینه چقدر است؟\n۲. مدت دوره چقدر است؟");
-          } else if (data === 'menu_contact') {
-            await sendMessage(chatId, "پشتیبانی: ۰۲۱-۱۲۳۴۵۶۷۸ (ساعت ۹ تا ۱۷)");
-          } else if (data === 'menu_exit') {
-            await sendMessage(chatId, "از منو خارج شدید. برای بازگشت /menu را بزنید.");
+          if (data === 'menu_faq') {
+            const faqText = "📋 *پرسش‌های متداول تسهیلات آموزشی فرزندان کارمندان*\n\nلطفاً یکی از سوالات زیر را انتخاب کنید:";
+            await editMessageText(chatId, messageId, faqText, getFaqQuestionsMenu());
           }
-          continue;
+          else if (data === 'menu_contact') {
+            const contact = getContactMenu();
+            await editMessageText(chatId, messageId, contact.text, contact.reply_markup);
+            // برای تماس، بهتر است یک پیام جدید ارسال شود (چون نیازی به ویرایش منو نیست)
+            //await sendMessage(chatId, "📞 پشتیبانی: ۰۹۹۱۲۷۰۷۲۸۵ (ساعت ۹ تا ۱۷)");
+            // همچنین می‌توانید منوی اصلی را دوباره برای همان پیام ویرایش نکنید
+            // اما برای برگشت، کاربر می‌تواند /menu بزند یا دکمه جدیدی اضافه کنید
+          }
+          else if (data === 'menu_help') {
+            const help = getHelpMenu();
+            await editMessageText(chatId, messageId, help.text, help.reply_markup);
+          }
+          else if (data === 'back_to_main') {
+            await editMessageText(chatId, messageId, "منوی اصلی ربات را انتخاب کنید:", getMainInlineMenu());
+          }
+          else if (data === 'faq_q1') {
+            const answer = "✅ *تسهیلات شامل چه کسانی می‌شود؟*\n\nفقط برای فرزندان کارمندان بالای ۴ سال (از پیش‌دبستانی تا دانشگاه).";
+            await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
+          }
+          else if (data === 'faq_q2') {
+            const answer = "💰 *سقف یارانه و نحوه پرداخت:*\n\nبه ازای هر فرزند ۱۵ میلیون تومان معرفی‌نامه تعلق می‌گیرد. ۵۰٪ آن شرکت به عنوان یارانه می‌پردازد و ۵۰٪ باقی‌مانده (متناسب با هزینه واقعی) حداکثر در ۳ قسط از فیش حقوقی کسر می‌شود.";
+            await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
+          }
+          else if (data === 'faq_q3') {
+            const answer = "🏦 *آیا باید هزینه کلاس را نقداً بپردازم؟*\n\nخیر، به جز دوره‌های سازمان فرهنگی ورزشی شهرداری اصفهان، شرکت هزینه را مستقیماً با مراکز طرف قرارداد تسویه می‌کند و نیازی به پرداخت نقدی شما نیست.";
+            await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
+          }
+          else if (data === 'faq_q4') {
+            const answer = "📄 *چگونه معرفی‌نامه دریافت کنم؟*\n\nاز طریق ارسال پیامک یا تماس تلفنی با کارشناسان واحد آموزش به شماره ۰۹۹۱۲۷۰۷۲۸۵ اقدام کنید.";
+            await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
+          }
+          else if (data === 'faq_q5') {
+            const answer = "⚠️ *در صورت غیبت غیرمجاز چه می‌شود؟*\n\nدر صورت غیبت غیرمجاز، کلیه مبالغ یارانه‌ای شرکت از فیش حقوقی شما کسر می‌شود و گواهی‌نامه نیز صادر نخواهد شد.";
+            await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
+          }
+          else if (data === 'back_to_faq_menu') {
+            const faqText = "📋 *پرسش‌های متداول تسهیلات آموزشی*\n\nلطفاً یکی از سوالات زیر را انتخاب کنید:";
+            await editMessageText(chatId, messageId, faqText, getFaqQuestionsMenu());
+          }
+
+          continue; // مهم: از پردازش بیشتر جلوگیری شود
         }
+
+        // بقیه کد (پردازش پیام‌های عادی، RAG و ...) بدون تغییر باقی می‌ماند
+        // if (update.callback_query) {
+        //   const query = update.callback_query;
+        //   const chatId = query.message.chat.id.toString();
+        //   const data = query.data;
+        //   console.log(query);
+
+        //   // اعلام دریافت به سرور بله (برای رفع چرخیدن دکمه)
+        //   await answerCallbackQuery(query.id);
+
+        //   if (data === 'menu_courses') {
+        //     await sendMessage(chatId, "دوره‌های موجود:\n• برنامه‌نویسی پایتون\n• طراحی سایت با React\n• هوش مصنوعی");
+        //   } else if (data === 'menu_faq') {
+        //     await sendMessage(chatId, "سوالات رایج:\n۱. هزینه چقدر است؟\n۲. مدت دوره چقدر است؟");
+        //   } else if (data === 'menu_contact') {
+        //     await sendMessage(chatId, "پشتیبانی: ۰۲۱-۱۲۳۴۵۶۷۸ (ساعت ۹ تا ۱۷)");
+        //   } else if (data === 'menu_exit') {
+        //     await sendMessage(chatId, "از منو خارج شدید. برای بازگشت /menu را بزنید.");
+        //   }
+        //   continue;
+        // }
 
         // ========== 2. پردازش پیام‌های متنی ==========
         const msg = update.message;
@@ -97,8 +162,8 @@ async function main() {
         if (text === "/start") {
           const welcomeText = "به ربات خوش آمدید!\n\nمن می‌توانم به سوالات شما بر اساس اسناد شرکت پاسخ دهم. سوال خود را بپرسید.";
           //await sendMessage(chatId, "به ربات خوش آمدید! سوال خود را بپرسید.");
-          await sendPhoto(chatId, "https://uploadkon.ir/uploads/a0a513_26welcome.jpg", "ربات هوشمند");
-          await sendMessage(chatId, welcomeText, getMainReplyMenu());
+          await sendPhoto(chatId, "https://uploadkon.ir/uploads/e85015_261781462818093.jpg", "ربات هوشمند");
+          await sendMessage(chatId, welcomeText, getMainInlineMenu());
           continue;
         }
 
