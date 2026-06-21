@@ -214,7 +214,7 @@ async function askModel(prompt) {
     const response = await axios.post(
         `${process.env.GAPGPT_BASE_URL}/chat/completions`,
         {
-            model: "gpt-5-nano",
+            model: process.env.GAPGPT_MODEL_NAME,
             messages: [
                 {
                     role: "system",
