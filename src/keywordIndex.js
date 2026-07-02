@@ -8,14 +8,22 @@ function tokenize(text) {
 }
 
 function buildKeywordIndex(docs) {
-
   return docs.map(d => ({
     tokens: tokenize(d.text),
     text: d.text,
-    source: d.source
+    source: d.source || (d.metadata && d.metadata.source) || 'unknown',
+    embedding: d.embedding || (d.metadata && d.metadata.embedding) || null  // ← اضافه شود
   }));
-
 }
+// function buildKeywordIndex(docs) {
+
+//   return docs.map(d => ({
+//     tokens: tokenize(d.text),
+//     text: d.text,
+//     source: d.source
+//   }));
+
+// }
 
 function keywordScore(queryTokens, docTokens) {
 

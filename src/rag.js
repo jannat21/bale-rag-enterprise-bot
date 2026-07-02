@@ -1,3 +1,12 @@
+const OpenAI = require('openai');
+require("dotenv").config();
+const metis_api_key = process.env.METISAI_APIKEY;
+
+const client = new OpenAI({
+    apiKey: metis_api_key,
+    baseURL: 'https://api.metisai.ir/openai/v1',
+});
+
 const axios = require("axios");
 
 /**
@@ -211,32 +220,24 @@ ${question}
  * ارسال به مدل
  */
 async function askModel(prompt) {
-    const response = await axios.post(
-        `${process.env.GAPGPT_BASE_URL}/chat/completions`,
-        {
-            model: process.env.GAPGPT_MODEL_NAME,
-            messages: [
-                {
-                    role: "system",
-                    content: "تو یک دستیار فارسی دقیق هستی و فقط بر اساس context پاسخ می‌دهی."
-                },
-                {
-                    role: "user",
-                    content: prompt
-                }
-            ],
-            temperature: 0.2
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${process.env.GAPGPT_API_KEY}`,
-                "Content-Type": "application/json"
+    // console.log(prompt)
+    const response = await client.chat.completions.create({
+        model: process.env.METIS_MODEL_NAME,
+        messages: [
+            {
+                role: "system",
+                content: "تو یک دستیار فارسی دقیق هستی و فقط بر اساس context پاسخ می‌دهی."
             },
-            timeout: 60000
-        }
-    );
+            {
+                role: "user",
+                content: prompt
+            }
+        ],
 
-    return response?.data?.choices?.[0]?.message?.content || "پاسخی دریافت نشد.";
+    });
+    console.log(response?.choices?.[0]?.message?.content || "پاسخی دریافت نشد.");
+
+    return response?.choices?.[0]?.message?.content || "پاسخی دریافت نشد.";
 }
 
 /**

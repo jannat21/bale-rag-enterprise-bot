@@ -198,21 +198,21 @@ async function main() {
         }
 
         // ========== 3. سوالات عادی (RAG) ==========
-        await saveMessage(chatId, "user", text);
-        let answer = "خطا در دریافت پاسخ.";
-        try {
-          answer = await askGapGPT(text, embedder, keywordDocs, chatId);
-        } catch (err) {
-          console.error(err.message);
-          answer = "سرویس در دسترس نیست. بعداً تلاش کنید.";
-        }
-        if (!answer.includes("اطلاعات کافی")) {
-          await saveMessage(chatId, "assistant", answer);
-        }
-        await sendMessage(chatId, answer);
+        // await saveMessage(chatId, "user", text);
+        // let answer = "خطا در دریافت پاسخ.";
+        // try {
+        //   answer = await askGapGPT(text, embedder, keywordDocs, chatId);
+        // } catch (err) {
+        //   console.error(err.message);
+        //   answer = "سرویس در دسترس نیست. بعداً تلاش کنید.";
+        // }
+        // if (!answer.includes("اطلاعات کافی")) {
+        //   await saveMessage(chatId, "assistant", answer);
+        // }
+        // await sendMessage(chatId, answer);
       }
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // await new Promise(resolve => setTimeout(resolve, 500));
     } catch (err) {
       console.error("Fatal error:", err.message);
       await new Promise(resolve => setTimeout(resolve, 5000));
