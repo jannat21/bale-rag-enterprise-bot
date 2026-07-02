@@ -110,10 +110,10 @@ async function main() {
             const answer = "💰 *سقف یارانه و نحوه پرداخت:*\n\nبه ازای هر فرزند ۱۵ میلیون تومان معرفی‌نامه تعلق می‌گیرد. ۵۰٪ آن شرکت به عنوان یارانه می‌پردازد و ۵۰٪ باقی‌مانده (متناسب با هزینه واقعی) حداکثر در ۳ قسط از فیش حقوقی کسر می‌شود.";
             await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
           }
-          else if (data === 'faq_q3') {
-            const answer = "🏦 *آیا باید هزینه کلاس را نقداً بپردازم؟*\n\nخیر، به جز دوره‌های سازمان فرهنگی ورزشی شهرداری اصفهان، شرکت هزینه را مستقیماً با مراکز طرف قرارداد تسویه می‌کند و نیازی به پرداخت نقدی شما نیست.";
-            await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
-          }
+          // else if (data === 'faq_q3') {
+          //   const answer = "🏦 *آیا باید هزینه کلاس را نقداً بپردازم؟*\n\nخیر، به جز دوره‌های سازمان فرهنگی ورزشی شهرداری اصفهان، شرکت هزینه را مستقیماً با مراکز طرف قرارداد تسویه می‌کند و نیازی به پرداخت نقدی شما نیست.";
+          //   await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
+          // }
           else if (data === 'faq_q4') {
             const answer = "📄 *چگونه معرفی‌نامه دریافت کنم؟*\n\nاز طریق ارسال پیامک یا تماس تلفنی با کارشناسان واحد آموزش به شماره ۰۹۹۱۲۷۰۷۲۸۵ اقدام کنید.";
             await editMessageText(chatId, messageId, answer, getBackToFaqMenuButton());
@@ -160,10 +160,10 @@ async function main() {
 
         // --- دستورات اسلش ---
         if (text === "/start") {
-          const welcomeText = "به ربات خوش آمدید!\n\nمن می‌توانم به سوالات شما بر اساس اسناد شرکت پاسخ دهم. سوال خود را بپرسید.";
+          //const welcomeText = "به ربات خوش آمدید!\n\nمن می‌توانم به سوالات شما بر اساس اسناد شرکت پاسخ دهم. سوال خود را بپرسید.";
           //await sendMessage(chatId, "به ربات خوش آمدید! سوال خود را بپرسید.");
           await sendPhoto(chatId, "https://uploadkon.ir/uploads/e85015_261781462818093.jpg", "ربات هوشمند");
-          await sendMessage(chatId, welcomeText, getMainInlineMenu());
+          await sendMessage(chatId, '     منوی دسترسی سریع   ', getMainInlineMenu());
           continue;
         }
 

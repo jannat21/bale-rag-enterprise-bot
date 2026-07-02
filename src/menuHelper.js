@@ -28,11 +28,11 @@ function getMainInlineMenu() {
 function getFaqQuestionsMenu() {
     return {
         inline_keyboard: [
-            [{ text: '۱️⃣ تسهیلات شامل چه کسانی می‌شود؟', callback_data: 'faq_q1' }],
-            [{ text: '۲️⃣ سقف یارانه و نحوه پرداخت؟', callback_data: 'faq_q2' }],
-            [{ text: '۳️⃣ آیا باید نقداً هزینه کلاس را بپردازم؟', callback_data: 'faq_q3' }],
-            [{ text: '۴️⃣ چگونه معرفی‌نامه دریافت کنم؟', callback_data: 'faq_q4' }],
-            [{ text: '۵️⃣ در صورت غیبت غیرمجاز چه می‌شود؟', callback_data: 'faq_q5' }],
+            [{ text: ' تسهیلات شامل چه کسانی می‌شود؟', callback_data: 'faq_q1' }],
+            [{ text: ' سقف یارانه و نحوه پرداخت؟', callback_data: 'faq_q2' }],
+            // [{ text: '۳️⃣ آیا باید نقداً هزینه کلاس را بپردازم؟', callback_data: 'faq_q3' }],
+            [{ text: ' چگونه معرفی‌نامه دریافت کنم؟', callback_data: 'faq_q4' }],
+            [{ text: ' در صورت غیبت غیرمجاز چه می‌شود؟', callback_data: 'faq_q5' }],
             [{ text: '🔙 بازگشت به منوی اصلی', callback_data: 'back_to_main' }]
         ]
     };
